@@ -10,9 +10,9 @@ const MSG_SIZE: usize = 32;
 fn sleep() {
     thread::sleep(Duration::from_millis(100));
 }
-
+// * Já consegui enviar mensagens pela rede, agora preciso que o servidor leia os dados da pasta
+// * exclusiva e envie para  o cliente
 // TODO: Organizar os loops e  partes longas em funções
-// TODO: enviar para o cliente a mensagem ao invé s de imprimir no server
 fn main() {
     let server = TcpListener::bind(LOCALHOST).expect("Listener failed to bind");
     server.set_nonblocking(true).expect("failed to initialize non-blocking");

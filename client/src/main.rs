@@ -7,6 +7,9 @@ use std::time::Duration;
 const LOCALHOST: &str = "127.0.0.1:5858";
 const MSG_SIZE: usize = 32;
 
+// * Já consegui enviar mensagens pela rede, agora preciso que o servidor leia os dados da pasta
+// * exclusiva e envie para  o cliente
+// TODO: Organizar os loops e  partes longas em funções
 fn main() {
     let mut client = TcpStream::connect(LOCALHOST).expect("Failed to connect");
     client.set_nonblocking(true).expect("Failed to initiate non blocking");
