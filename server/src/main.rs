@@ -3,10 +3,20 @@ use std::net::TcpListener;
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
+use std::fs::{self, DirBuilder, read_dir};
 
 const LOCALHOST: &str = "127.0.0.1:5858";
 const MSG_SIZE: usize = 32;
 
+
+fn check_path() -> std::io::Result<String> {
+    let mut s = String::new();
+    for entry in fs::read_dir(".")? {
+        let dir = entry?;
+        s = s.clone() + &(format!("{:?}\n", dir.path())).to_string();
+    }
+    Ok(s)
+}
 fn sleep() {
     thread::sleep(Duration::from_millis(100));
 }
@@ -46,13 +56,13 @@ fn main() {
             });
         }
 
-        if let Ok(msg) = rx.try_recv() {
-            clients = clients.into_iter().filter_map(|mut client| {
-                let mut buff = msg.clone().into_bytes();
-                buff.resize(MSG_SIZE, 0);
-    
-                client.write_all(&buff).map(|_| client).ok()
-            }).collect::<Vec<_>>();
+        loop {
+            let mut msg = String::new();
+            match check_path() {
+                Ok(st) => msg = st,
+                Err(_) => println!("Erro na leitura")
+            }
+            if tx.send(msg).is_err() { break }
         }
     }
 }

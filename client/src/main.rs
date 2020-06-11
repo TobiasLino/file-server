@@ -11,11 +11,14 @@ const MSG_SIZE: usize = 32;
 // * exclusiva e envie para  o cliente
 // TODO: Organizar os loops e  partes longas em funções
 fn main() {
+    println!("Starting...");
     let mut client = TcpStream::connect(LOCALHOST).expect("Failed to connect");
     client.set_nonblocking(true).expect("Failed to initiate non blocking");
 
     let (tx, rx) = mpsc::channel::<String>();
+    println!("Connected.");
 
+    println!("\nComandos aceitos:\n\tls - mostra os arquivos\n\texit - Sair.\n");
     thread::spawn(move || loop {
         let mut buff = vec![0; MSG_SIZE];
         match client.read_exact(&mut buff) {
@@ -48,7 +51,10 @@ fn main() {
         let mut buff = String::new();
         io::stdin().read_line(&mut buff).expect("reading failed");
         let msg = buff.trim().to_string();
-        if msg == ":quit" || tx.send(msg).is_err() { break }
+        if msg == "exit" { break }
+        // não é um comando aceitável? pula a última linha
+        if msg != "ls" { continue }
+        if tx.send(msg).is_err() { break }
     }
     println!("Bye");
 }
